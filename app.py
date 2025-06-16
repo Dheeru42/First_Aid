@@ -770,7 +770,9 @@ def start1():
 
 
 # Load hospital data once when server starts
-hospital_data = pd.read_csv(r'D:\project\First Aid\first_aid\hospitals_cleaned_india.csv')
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+csv_path = os.path.join(BASE_DIR,'hospitals_cleaned_india.csv')
+hospital_data = pd.read_csv(csv_path)
 
 # Home page
 @app.route("/search/", methods=['GET', 'POST'])
