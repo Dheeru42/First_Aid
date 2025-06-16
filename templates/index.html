@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FirstAid - Self Diagnosis & Emergency Care</title>
+    <link rel="icon" href="{{ url_for('static', filename='favi.jpg') }}" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   
+    <style>
+        :root {
+            --primary: #2a9d8f;
+            --secondary: #264653;
+            --accent: #e9c46a;
+            --danger: #e76f51;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .logo i {
+            color: var(--accent);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+
+        nav a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .hero {
+            background: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            color: white;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            display: inline-block;
+            background-color: var(--accent);
+            color: var(--dark);
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            background-color: #f1b843;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #238f81;
+        }
+
+        .main {
+            padding: 4rem 0;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background-color: var(--accent);
+            margin: 0 auto;
+        }
+
+        .diagnosis-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+
+        textarea, input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        textarea:focus, input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.2);
+        }
+
+        .processing-container {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .heart-pulse {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 2rem;
+        }
+
+        .heart {
+            position: absolute;
+            width: 100px;
+            height: 90px;
+            top: 0;
+            left: 0;
+            background-color: var(--danger);
+            transform: rotate(-45deg);
+            animation: pulse 1s ease infinite;
+        }
+
+        .heart::before, .heart::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 90px;
+            background-color: var(--danger);
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            top: -45px;
+            left: 0;
+        }
+
+        .heart::after {
+            top: 0;
+            left: 45px;
+        }
+
+        @keyframes pulse {
+            0% { transform: rotate(-45deg) scale(1); }
+            50% { transform: rotate(-45deg) scale(1.1); }
+            100% { transform: rotate(-45deg) scale(1); }
+        }
+
+        .result-container {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .result-container h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .prescription {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+
+        .prescription h4 {
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .prescription ul {
+            list-style-position: inside;
+            margin-bottom: 1rem;
+        }
+
+        .prescription li {
+            margin-bottom: 0.5rem;
+        }
+
+        .doctor-animation {
+            position: relative;
+            height: 150px;
+            margin: 2rem auto;
+            width: 300px;
+            overflow: hidden;
+        }
+
+        .doctor {
+            position: absolute;
+            left: -100px;
+            top: 50px;
+            font-size: 3rem;
+            animation: doctorWalk 4s ease-in-out forwards;
+            transform: scaleX(-1);
+        }
+
+        @keyframes doctorWalk {
+            0% { left: -100px; }
+            100% { left: 100px; }
+        }
+
+        .emergency-section {
+            background-color: var(--secondary);
+            color: white;
+            padding: 3rem 0;
+        }
+
+        .emergency-section .section-title h2 {
+            color: white;
+        }
+
+        .emergency-section .section-title::after {
+            background-color: var(--accent);
+        }
+        .search-bar {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .search-bar input {
+            width: 100%;
+            max-width: 500px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .hospital-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .hospital-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            color: var(--dark);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .hospital-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .hospital-card h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .hospital-card p {
+            margin-bottom: 0.5rem;
+        }
+
+        .hospital-card .distance {
+            display: inline-block;
+            background-color: var(--light);
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .hospital-card .call-btn {
+            display: inline-block;
+            background-color: var(--danger);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .hospital-card .call-btn:hover {
+            background-color: #d45a3d;
+        }
+
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0 1.5rem;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column h3 {
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-column a {
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-column a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background-color: var(--accent);
+            color: var(--dark);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+
+            .section-title h2 {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .hero {
+                height: 400px;
+            }
+
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <span>FirstAid</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#diagnosis">Self Diagnosis</a></li>
+                    <li><a href="#emergency">Emergency</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="container hero-content">
+            <h1>Your Health Is Our Priority</h1>
+            <p>Get instant preliminary diagnosis based on your symptoms and find emergency care near you when you need it most.</p>
+            <a href="#diagnosis" class="btn">Start Diagnosis</a>
+        </div>
+    </section>
+
+    <main class="main">
+        <section id="diagnosis">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Symptom Checker</h2>
+                    <p>Enter your symptoms below to get a preliminary diagnosis</p>
+                </div>
+
+                <div class="diagnosis-container">
+                    <form id='diagnosisForm'>
+                        <div class="form-group">
+                            <label for="die">Diseases</label>
+                            <select id="die" name="die" required>
+                                <option>Select Diseases For Diagnose</option>
+                                <option>Influenza</option>
+                                <option>Common Cold</option>
+                                <option>Eczema</option>
+                                <option>Asthma</option>
+                                <option>Hyperthyroidism</option>
+                                <option>Allergic Rhinitis</option>
+                                <option>Anxiety Disorders</option>
+                                <option>Diabetes</option>
+                                <option>Gastroenteritis</option>
+                                <option>Pancreatitis</option>
+                                <option>Rheumatoid Arthritis</option>
+                                <option>Depression</option>
+                                <option>Liver Cancer</option>
+                                <option>Stroke</option>
+                                <option>Urinary Tract Infection</option>
+                                <option>Dengue Fever</option>
+                                <option>Hepatitis</option>
+                                <option>Kidney Cancer</option>
+                                <option>Migraine</option>
+                                <option>Muscular Dystrophy</option>
+                                <option>Sinusitis</option>
+                                <option>Ulcerative Colitis</option>
+                                <option>Bipolar Disorder</option>
+                                <option>Bronchitis</option>
+                                <option>Cerebral Palsy</option>
+                                <option>Colorectal Cancer</option>
+                                <option>Hypertensive Heart Disease</option>
+                                <option>Multiple Sclerosis</option>
+                                <option>Myocardial Infarction (Heart...)</option>
+                                <option>Urinary Tract Infection (UTI)</option>
+                                <option>Osteoporosis</option>
+                                <option>Pneumonia</option>
+                                <option>Atherosclerosis</option>
+                                <option>Chronic Obstructive Pulmonary...</option>
+                                <option>Epilepsy</option>
+                                <option>Hypertension</option>
+                                <option>Obsessive-Compulsive Disorde...</option>
+                                <option>Psoriasis</option>
+                                <option>Rubella</option>
+                                <option>Cirrhosis</option>
+                                <option>Conjunctivitis (Pink Eye)</option>
+                                <option>Liver Disease</option>
+                                <option>Malaria</option>
+                                <option>Spina Bifida</option>
+                                <option>Kidney Disease</option>
+                                <option>Osteoarthritis</option>
+                                <option>Klinefelter Syndrome</option>
+                                <option>Acne</option>
+                                <option>Brain Tumor</option>
+                                <option>Cystic Fibrosis</option>
+                                <option>Glaucoma</option>
+                                <option>Rabies</option>
+                                <option>Chickenpox</option>
+                                <option>Coronary Artery Disease</option>
+                                <option>Eating Disorders (Anorexia,...)</option>
+                                <option>Fibromyalgia</option>
+                                <option>Hemophilia</option>
+                                <option>Hypoglycemia</option>
+                                <option>Lymphoma</option>
+                                <option>Tuberculosis</option>
+                                <option>Lung Cancer</option>
+                                <option>Hypothyroidism</option>
+                                <option>Autism Spectrum Disorder (ASD)</option>
+                                <option>Crohn's Disease</option>
+                                <option>Hyperglycemia</option>
+                                <option>Melanoma</option>
+                                <option>Ovarian Cancer</option>
+                                <option>Turner Syndrome</option>
+                                <option>Zika Virus</option>
+                                <option>Cataracts</option>
+                                <option>Pneumocystis Pneumonia (PCP)</option>
+                                <option>Scoliosis</option>
+                                <option>Sickle Cell Anemia</option>
+                                <option>Tetanus</option>
+                                <option>Anemia</option>
+                                <option>Cholera</option>
+                                <option>Endometriosis</option>
+                                <option>Sepsis</option>
+                                <option>Sleep Apnea</option>
+                                <option>Down Syndrome</option>
+                                <option>Ebola Virus</option>
+                                <option>Lyme Disease</option>
+                                <option>Pancreatic Cancer</option>
+                                <option>Pneumothorax</option>
+                                <option>Appendicitis</option>
+                                <option>Esophageal Cancer</option>
+                                <option>HIV/AIDS</option>
+                                <option>Marfan Syndrome</option>
+                                <option>Parkinson's Disease</option>
+                                <option>Hemorrhoids</option>
+                                <option>Polycystic Ovary Syndrome (PCOS)</option>
+                                <option>Systemic Lupus Erythematosus...</option>
+                                <option>Typhoid Fever</option>
+                                <option>Breast Cancer</option>
+                                <option>Measles</option>
+                                <option>Osteomyelitis</option>
+                                <option>Polio</option>
+                                <option>Chronic Kidney Disease</option>
+                                <option>Hepatitis B</option>
+                                <option>Prader-Willi Syndrome</option>
+                                <option>Thyroid Cancer</option>
+                                <option>Bladder Cancer</option>
+                                <option>Otitis Media (Ear Infection)</option>
+                                <option>Tourette Syndrome</option>
+                                <option>Alzheimer's Disease</option>
+                                <option>Chronic Obstructive Pulmonary Disease (COPD)</option>
+                                <option>Dementia</option>
+                                <option>Diverticulitis</option>
+                                <option>Mumps</option>
+                                <option>Cholecystitis</option>
+                                <option>Prostate Cancer</option>
+                                <option>Schizophrenia</option>
+                                <option>Gout</option>
+                                <option>Testicular Cancer</option>
+                                <option>Tonsillitis</option>
+                                <option>Williams Syndrome</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="age">Age</label>
+                            <input type="number" placeholder='Enter Your Age' id="age" name="age" min="1" max="120" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="gender">Gender</label>
+                            <select id="gender" name="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Headache (If Yes otherwise No)</label>
+                            <select name="Headache" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Fever (If Yes otherwise No)</label>
+                            <select name="fever" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Cough (If Yes otherwise No)</label>
+                            <select name="cough" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Dizziness (If Yes otherwise No)</label>
+                            <select name="dizz" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="isymptom">Blurred Vision (If Yes otherwise No)</label>
+                            <select name="blu_vis" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Chest Pain (If Yes otherwise No)</label>
+                            <select name="ches_pai" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Fatigue (If Yes otherwise No)</label>
+                            <select name="fati" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Shortness of Breath (If Yes otherwise No)</label>
+                            <select name="shor_brea" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Difficulty Breathing (If Yes otherwise No)</label>
+                            <select name="diff_brea" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Irregular Heartbeat (If Yes otherwise No)</label>
+                            <select name="ireg_hertb" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Sweating (If Yes otherwise No)</label>
+                            <select name="sweat" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Sleep Problems (If Yes otherwise No)</label>
+                            <select name="slp_pr" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Swelling in legs (If Yes otherwise No)</label>
+                            <select name="swel_leg" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="symptom">Tinnitus (If Yes otherwise No)</label>
+                            <select name="tinnit" required>
+                                <option value="">Select Symptom</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Diagnose Symptoms</button>
+                    </form>
+
+                    <div class="processing-container" id="processingContainer">
+                        <div class="heart-pulse">
+                            <div class="heart"></div>
+                        </div>
+                        <h3>Analyzing your symptoms...</h3>
+                        <p>Please wait while we process your information.</p>
+                    </div>
+
+                    <div class="result-container" id="resultContainer">
+                        <h3>Preliminary Diagnosis Result</h3>
+                        <p>Based on your symptoms, you might be experiencing:</p>
+                        <div id="diagnosisResult">
+                            <!-- This will be filled by JavaScript -->
+                        </div>
+                        <div class="prescription" id="prescriptionContainer" style="display: none;">
+                            <h4>Recommended Treatment</h4>
+                            <div id="prescriptionContent">
+                                <!-- This will be filled by JavaScript -->
+                            </div>
+                            <p class="disclaimer"><strong>Disclaimer:</strong> This is not a substitute for professional medical advice. Please consult a doctor for proper diagnosis and treatment.</p>
+                        </div>
+
+                        <button class="btn" id="showPrescriptionBtn" style="display: none;">Show Prescription</button>
+
+                        <div class="doctor-animation" id="doctorAnimation" style="display: none;">
+                            <div class="doctor">👨‍⚕️</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="emergency-section" id="emergency">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Emergency Hospitals Near You</h2>
+                    <p>Find the nearest emergency care facilities</p>
+                </div>
+                 <!-- Search Bar -->
+                 <div style="text-align: center; margin-bottom: 20px;">
+                    <input type="text" id="hospitalSearch" placeholder="Search hospitals or city..." style="padding: 10px; width: 300px;">
+                    <button onclick="searchHospitals()" class="btn btn-primary" style="padding: 10px;">Search</button>
+                </div>
+
+                <div class="hospital-list" id="hospitalList">
+                    <!-- Hospitals will be loaded here by JavaScript -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>FirstAid</h3>
+                    <p>Your trusted partner in preliminary health diagnosis and emergency care location.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="#diagnosis">Self Diagnosis</a></li>
+                        <li><a href="#emergency">Emergency</a></li>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Services</h3>
+                    <ul>
+                        <li><a href="#diagnosis">Symptom Checker</a></li>
+                        <li><a href="#">Medicine Information</a></li>
+                        <li><a href="#emergency">Hospital Locator</a></li>
+                        <li><a href="#">First Aid Guides</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Us</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Medical Way, Health City</li>
+                        <li><i class="fas fa-phone"></i> +1 (234) 567-8900</li>
+                        <li><i class="fas fa-envelope"></i> info@firstaid.com</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 FirstAid. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const diagnosisForm = document.getElementById('diagnosisForm');
+            const processingContainer = document.getElementById('processingContainer');
+            const resultContainer = document.getElementById('resultContainer');
+            const diagnosisResult = document.getElementById('diagnosisResult');
+            const prescriptionContainer = document.getElementById('prescriptionContainer');
+            const showPrescriptionBtn = document.getElementById('showPrescriptionBtn');
+            const doctorAnimation = document.getElementById('doctorAnimation');
+            const prescriptionContent = document.getElementById('prescriptionContent');
+            const hospitalList = document.getElementById('hospitalList');
+        
+        
+            // Load hospitals dynamically
+            function loadHospitals() {
+                hospitalList.innerHTML = '';
+                hospitals.forEach(hospital => {
+                    const hospitalCard = document.createElement('div');
+                    hospitalCard.className = 'hospital-card';
+                    hospitalCard.innerHTML = `
+                        <h3>${hospital.name}</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> ${hospital.address}</p>
+                        <p><i class="fas fa-phone"></i> ${hospital.phone}</p>
+                        <p><i class="fas fa-exclamation-triangle"></i> ${hospital.emergency}</p>
+                        <span class="distance"><i class="fas fa-walking"></i> ${hospital.distance} away</span><br>
+                        <a href="tel:${hospital.phone.replace(/[^0-9]/g, '')}" class="call-btn"><i class="fas fa-phone"></i> Call Now</a>
+                    `;
+                    hospitalList.appendChild(hospitalCard);
+                });
+            }
+        
+            // Handle diagnosis form submission
+            diagnosisForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+        
+                // Show processing animation
+                diagnosisForm.style.display = 'none';
+                processingContainer.style.display = 'block';
+                window.scrollTo({ top: processingContainer.offsetTop, behavior: 'smooth' });
+        
+                const formData = new FormData(diagnosisForm);
+        
+                fetch('/model_form', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                    },
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    processingContainer.style.display = 'none';
+                    resultContainer.style.display = 'block';
+        
+                    // Display diagnosis result
+                    diagnosisResult.innerHTML = `
+                        <h4>${data.condition}</h4>
+                        <h4>${data.description}</h4>
+                    `;
+        
+                    // Show prescription button if available
+                    if (data.prescription) {
+                        showPrescriptionBtn.style.display = 'inline-block';
+        
+                        showPrescriptionBtn.onclick = function () {
+                            showPrescriptionBtn.style.display = 'none';
+                            doctorAnimation.style.display = 'block';
+        
+                            // Add heartbeat effect to the doctor animation
+                            doctorAnimation.classList.add('heartbeat');  // Add heartbeat class here
+        
+                            setTimeout(() => {
+                                doctorAnimation.style.display = 'none';
+                                prescriptionContainer.style.display = 'block';
+        
+                                // Display the prescription data
+                                prescriptionContent.innerHTML = `
+                                    <h5>Medications:</h5>
+                                    <ul>${data.prescription.medications.map(m => `<li>${m}</li>`).join('')}</ul>
+                                    <h5>Recommendations:</h5>
+                                    <ul>${data.prescription.recommendations.map(r => `<li>${r}</li>`).join('')}</ul>
+                                    <h5>Note:</h5>
+                                    <p>${data.prescription.note}</p>
+                                    <h5>Advise:</h5>
+                                    <p>${data.prescription.advise}</p>
+                                    <h5 style="color: var(--danger);">Warning:</h5>
+                                    <p>${data.prescription.warning}</p>
+                                `;
+                            }, 4000); // Adjust to match animation duration
+                        };
+                    }
+                    // Scroll to results section
+                    resultContainer.scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+        
+            // Load hospital information when the page loads
+            loadHospitals();
+        });
+        function searchHospitals() {
+            const query = document.getElementById('hospitalSearch').value;
+        
+            fetch(`/search/?query=${encodeURIComponent(query)}`)
+            .then(response => response.json())
+            .then(data => {
+                const hospitalList = document.getElementById('hospitalList');
+                hospitalList.innerHTML = '';
+        
+                if (data.length === 0) {
+                    hospitalList.innerHTML = '<p>No hospitals found.</p>';
+                    return;
+                }
+        
+                data.forEach(hospital => {
+                    const card = document.createElement('div');
+                    card.className = 'hospital-card';
+                    card.innerHTML = `
+                        <h3>${hospital.name}</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> ${hospital.address}, ${hospital.city}</p>
+                        <p><i class="fas fa-phone"></i> ${hospital.phone}</p>
+                        <p><i class="fas fa-location-arrow"></i> ${hospital.state} - ${hospital.pincode}</p>
+                        <a href="tel:${hospital.phone}" class="call-btn"><i class="fas fa-phone"></i> Call Now</a>
+                    `;
+                    hospitalList.appendChild(card);
+                });
+            });
+        }
+</script>
+
+</body>
+</html>
